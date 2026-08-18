@@ -218,7 +218,7 @@ mnemos/
   modules/       product_key, slot_attention, surprise, knn
   data/          synthetic probes, byte-level text
 configs/         one tiny config per memory kind
-tests/           94 tests, including the causality suite
+tests/           111 tests, including the causality and sweep-plan suites
 ```
 
 ## A bug this repo found
