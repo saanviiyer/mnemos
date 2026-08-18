@@ -1,0 +1,30 @@
+# Shared shape for every tiny config. Copy it, change the memory block, leave the rest.
+# Sized so a full arm finishes in a few minutes on a laptop GPU.
+name: tiny-base
+model:
+  vocab_size: 64
+  d_model: 128
+  n_layers: 4
+  n_heads: 4
+  d_ff: 256
+  max_seq_len: 36
+  dropout: 0.0
+  tie_embeddings: true
+  memory:
+    kind: none
+    layers: []
+data:
+  kind: associative_recall
+  seq_len: 36
+  vocab_size: 64
+  params: {n_pairs: 12, n_queries: 4}
+train:
+  steps: 3000
+  batch_size: 128
+  lr: 3.0e-3
+  warmup: 200
+  eval_every: 750
+  eval_batches: 16
+  log_every: 100
+  seed: 0
+  out_dir: runs/tiny-base
