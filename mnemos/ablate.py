@@ -22,6 +22,8 @@ import copy
 from dataclasses import replace
 from typing import Dict, Literal, Tuple
 
+import torch
+
 from .config import ExperimentConfig
 from .model import MemoryLM
 
@@ -29,7 +31,19 @@ Match = Literal["params", "flops"]
 
 
 def _measure(cfg: ExperimentConfig, seq_len: int) -> Tuple[int, float]:
-    m = MemoryLM(cfg.model)
+    """Count parameters and FLOPs without allocating any.
+
+    The bisection below builds a model per probe, and at cluster scale a probe can
+    ask for a d_ff in the tens of thousands, which is gigabytes of weights that get
+    counted and thrown away. Building on the meta device gives identical shapes at
+    no allocation cost. Falls back to a real build for any module that cannot be
+    constructed meta-side.
+    """
+    try:
+        with torch.device("meta"):
+            m = MemoryLM(cfg.model)
+    except (NotImplementedError, RuntimeError):
+        m = MemoryLM(cfg.model)
     return m.param_count(), m.flops_per_token(seq_len)
 
 

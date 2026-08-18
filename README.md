@@ -170,6 +170,39 @@ python scripts/report.py         # formats runs/bench/*.json into markdown
 About an hour on an M-series laptop. `RESULTS.md` holds the output and the reading of
 it. Everything in it is a laptop-scale result and is labelled as one.
 
+## Sweeps
+
+`scripts/sweep.py` runs an arm x seed grid and survives being killed. Finished runs
+are skipped; a run interrupted mid-flight resumes from its last checkpoint with the
+data order intact, so a resumed run reaches bit-identical weights rather than quietly
+replaying batches it already trained on.
+
+```bash
+python scripts/sweep.py --scale small --seeds 0,1,2 --steps 10000 --dry-run
+nohup python -u scripts/sweep.py --scale small --seeds 0,1,2 --steps 10000 > sweep.log 2>&1 &
+```
+
+Three scales are defined:
+
+| scale | params | seq / pairs | steps | purpose |
+|---|---|---|---|---|
+| `tiny` | 0.8M | 36 / 12 | 3k | reproduces `RESULTS.md`, minutes per arm |
+| `small` | 4.7M | 128 / 32 | 10k | laptop-sized comparison with error bars |
+| `cluster` | 21M dense | 256 / 64 | 30k | the table-size sweep, needs a real GPU |
+
+`cluster` is the one that asks the actual large-memory question. Everything is held
+fixed and only `n_keys` moves, so the memory table goes from 0.5M parameters (2.5% of
+the dense weights) to 34M (161% of them), and each point carries its own matched
+controls. That is where the sparse-memory asymmetry stops being a footnote: at
+`n_keys=512`, matching the memory on parameters needs `d_ff` 3798 while matching it on
+FLOPs needs `d_ff` 1067. Two defensible "fair" baselines that differ by 3.6x in width.
+There is no single honest control number, and the tier is built to make that visible
+rather than to pick whichever one flatters the method.
+
+Runs are ordered seed-major, so every prefix of the plan is a complete sweep at some
+seed count. Arm-major ordering would spend the first half of a budget putting three
+seeds on three arms and none on the rest.
+
 ## Layout
 
 ```

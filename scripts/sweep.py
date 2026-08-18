@@ -33,19 +33,25 @@ from mnemos.train import Trainer                                         # noqa:
 # --- scales -------------------------------------------------------------------
 # "tiny" reproduces RESULTS.md. "small" is the scale-up: 2x width, 1.5x depth,
 # 3.5x sequence, 2.7x pairs to remember, 5x steps.
+def _pkm(n_keys: int, v_dim: int = 128) -> dict:
+    return {"kind": "product_key",
+            "params": dict(n_keys=n_keys, n_heads=4, topk=8, half_dim=32, v_dim=v_dim)}
+
+
 SCALES: Dict[str, dict] = {
     "tiny": dict(
         vocab_size=64, d_model=128, n_layers=4, n_heads=4, d_ff=256,
         seq_len=36, n_pairs=12, n_queries=4,
         steps=3000, batch_size=128, lr=3e-3, warmup=200,
         eval_every=750, eval_batches=16, log_every=100, ckpt_every=500,
-        memory_layer=2,
+        memory_layer=2, controls_for=["product_key"],
         arms={
-            "none": {},
-            "product_key": dict(n_keys=32, n_heads=4, topk=8, half_dim=32, v_dim=64),
-            "slot": dict(n_slots=32, n_heads=4, chunk_size=4),
-            "surprise": dict(d_key=64, d_val=64, chunk_size=4, inner_lr=0.5),
-            "knn": dict(capacity=8192, d_key=64, topk=16),
+            "none": {"kind": "none", "params": {}},
+            "product_key": _pkm(32, v_dim=64),
+            "slot": {"kind": "slot", "params": dict(n_slots=32, n_heads=4, chunk_size=4)},
+            "surprise": {"kind": "surprise",
+                         "params": dict(d_key=64, d_val=64, chunk_size=4, inner_lr=0.5)},
+            "knn": {"kind": "knn", "params": dict(capacity=8192, d_key=64, topk=16)},
         },
     ),
     "small": dict(
@@ -53,13 +59,36 @@ SCALES: Dict[str, dict] = {
         seq_len=128, n_pairs=32, n_queries=8,
         steps=15000, batch_size=128, lr=1.5e-3, warmup=800,
         eval_every=1500, eval_batches=16, log_every=250, ckpt_every=500,
-        memory_layer=3,
+        memory_layer=3, controls_for=["product_key"],
         arms={
-            "none": {},
-            "product_key": dict(n_keys=64, n_heads=4, topk=8, half_dim=32, v_dim=128),
-            "slot": dict(n_slots=64, n_heads=4, chunk_size=16),
-            "surprise": dict(d_key=128, d_val=128, chunk_size=16, inner_lr=0.5),
-            "knn": dict(capacity=16384, d_key=128, topk=16),
+            "none": {"kind": "none", "params": {}},
+            "product_key": _pkm(64),
+            "slot": {"kind": "slot", "params": dict(n_slots=64, n_heads=4, chunk_size=16)},
+            "surprise": {"kind": "surprise",
+                         "params": dict(d_key=128, d_val=128, chunk_size=16, inner_lr=0.5)},
+            "knn": {"kind": "knn", "params": dict(capacity=16384, d_key=128, topk=16)},
+        },
+    ),
+    # The question neither laptop tier asks: what happens as the memory table grows
+    # relative to the dense parameters. Everything else is held fixed and only n_keys
+    # moves, from a table worth 0.3% of the dense weights to one worth 160% of them.
+    # Each point carries its own matched controls, which is where the sparse-memory
+    # asymmetry becomes impossible to ignore: matching 33M memory parameters with dense
+    # width means a d_ff of ~3750 against a baseline of 1024.
+    "cluster": dict(
+        vocab_size=256, d_model=512, n_layers=8, n_heads=8, d_ff=1024,
+        seq_len=256, n_pairs=64, n_queries=16,
+        steps=30000, batch_size=128, lr=1e-3, warmup=1500,
+        eval_every=3000, eval_batches=32, log_every=500, ckpt_every=500,
+        memory_layer=4,
+        controls_for=["pkm_k32", "pkm_k64", "pkm_k128", "pkm_k256", "pkm_k512"],
+        arms={
+            "none": {"kind": "none", "params": {}},
+            "pkm_k32": _pkm(32),      # 1k slots,   0.1M memory params
+            "pkm_k64": _pkm(64),      # 4k slots,   0.5M
+            "pkm_k128": _pkm(128),    # 16k slots,  2.1M
+            "pkm_k256": _pkm(256),    # 65k slots,  8.4M
+            "pkm_k512": _pkm(512),    # 262k slots, 33.5M
         },
     ),
 }
@@ -68,8 +97,8 @@ SCALES: Dict[str, dict] = {
 def make_config(scale: str, arm: str, seed: int, out_root: Path,
                 steps: int | None = None) -> ExperimentConfig:
     s = SCALES[scale]
-    kind = arm
-    params = s["arms"][arm]
+    spec = s["arms"][arm]
+    kind, params = spec["kind"], spec["params"]
     cfg = ExperimentConfig.from_dict({
         "name": f"{scale}-{arm}-s{seed}",
         "model": {
@@ -111,12 +140,17 @@ def plan(scale: str, seeds: List[int], arms: List[str], out_root: Path,
     for seed in seeds:
         for arm in arms:
             runs.append(make_config(scale, arm, seed, out_root, steps))
-        if "product_key" in arms:
-            base = make_config(scale, "product_key", seed, out_root, steps)
+        bases = [b for b in SCALES[scale].get("controls_for", []) if b in arms]
+        for base_arm in bases:
+            base = make_config(scale, base_arm, seed, out_root, steps)
+            # With a single control base there is nothing to disambiguate, so the name
+            # stays short; with several the base arm has to be in the name or the
+            # directories collide.
+            tag = "" if len(bases) == 1 else f"_{base_arm}"
             for match in ("params", "flops"):
                 ctrl, _ = matched_baseline_config(base, match)
-                ctrl.name = f"{scale}-matched_{match}-s{seed}"
-                ctrl.train.out_dir = str(out_root / f"matched_{match}_s{seed}")
+                ctrl.name = f"{scale}-matched_{match}{tag}-s{seed}"
+                ctrl.train.out_dir = str(out_root / f"matched_{match}{tag}_s{seed}")
                 ctrl.train.resume = True
                 runs.append(ctrl)
     return runs

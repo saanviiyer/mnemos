@@ -1,0 +1,170 @@
+[
+  {
+    "name": "small-none-s0",
+    "out_dir": "runs/sweep_small/none_s0",
+    "steps": 10000,
+    "memory_kind": "none",
+    "d_ff": 512,
+    "seed": 0
+  },
+  {
+    "name": "small-product_key-s0",
+    "out_dir": "runs/sweep_small/product_key_s0",
+    "steps": 10000,
+    "memory_kind": "product_key",
+    "d_ff": 512,
+    "seed": 0
+  },
+  {
+    "name": "small-slot-s0",
+    "out_dir": "runs/sweep_small/slot_s0",
+    "steps": 10000,
+    "memory_kind": "slot",
+    "d_ff": 512,
+    "seed": 0
+  },
+  {
+    "name": "small-surprise-s0",
+    "out_dir": "runs/sweep_small/surprise_s0",
+    "steps": 10000,
+    "memory_kind": "surprise",
+    "d_ff": 512,
+    "seed": 0
+  },
+  {
+    "name": "small-knn-s0",
+    "out_dir": "runs/sweep_small/knn_s0",
+    "steps": 10000,
+    "memory_kind": "knn",
+    "d_ff": 512,
+    "seed": 0
+  },
+  {
+    "name": "small-matched_params-s0",
+    "out_dir": "runs/sweep_small/matched_params_s0",
+    "steps": 10000,
+    "memory_kind": "none",
+    "d_ff": 673,
+    "seed": 0
+  },
+  {
+    "name": "small-matched_flops-s0",
+    "out_dir": "runs/sweep_small/matched_flops_s0",
+    "steps": 10000,
+    "memory_kind": "none",
+    "d_ff": 559,
+    "seed": 0
+  },
+  {
+    "name": "small-none-s1",
+    "out_dir": "runs/sweep_small/none_s1",
+    "steps": 10000,
+    "memory_kind": "none",
+    "d_ff": 512,
+    "seed": 1
+  },
+  {
+    "name": "small-product_key-s1",
+    "out_dir": "runs/sweep_small/product_key_s1",
+    "steps": 10000,
+    "memory_kind": "product_key",
+    "d_ff": 512,
+    "seed": 1
+  },
+  {
+    "name": "small-slot-s1",
+    "out_dir": "runs/sweep_small/slot_s1",
+    "steps": 10000,
+    "memory_kind": "slot",
+    "d_ff": 512,
+    "seed": 1
+  },
+  {
+    "name": "small-surprise-s1",
+    "out_dir": "runs/sweep_small/surprise_s1",
+    "steps": 10000,
+    "memory_kind": "surprise",
+    "d_ff": 512,
+    "seed": 1
+  },
+  {
+    "name": "small-knn-s1",
+    "out_dir": "runs/sweep_small/knn_s1",
+    "steps": 10000,
+    "memory_kind": "knn",
+    "d_ff": 512,
+    "seed": 1
+  },
+  {
+    "name": "small-matched_params-s1",
+    "out_dir": "runs/sweep_small/matched_params_s1",
+    "steps": 10000,
+    "memory_kind": "none",
+    "d_ff": 673,
+    "seed": 1
+  },
+  {
+    "name": "small-matched_flops-s1",
+    "out_dir": "runs/sweep_small/matched_flops_s1",
+    "steps": 10000,
+    "memory_kind": "none",
+    "d_ff": 559,
+    "seed": 1
+  },
+  {
+    "name": "small-none-s2",
+    "out_dir": "runs/sweep_small/none_s2",
+    "steps": 10000,
+    "memory_kind": "none",
+    "d_ff": 512,
+    "seed": 2
+  },
+  {
+    "name": "small-product_key-s2",
+    "out_dir": "runs/sweep_small/product_key_s2",
+    "steps": 10000,
+    "memory_kind": "product_key",
+    "d_ff": 512,
+    "seed": 2
+  },
+  {
+    "name": "small-slot-s2",
+    "out_dir": "runs/sweep_small/slot_s2",
+    "steps": 10000,
+    "memory_kind": "slot",
+    "d_ff": 512,
+    "seed": 2
+  },
+  {
+    "name": "small-surprise-s2",
+    "out_dir": "runs/sweep_small/surprise_s2",
+    "steps": 10000,
+    "memory_kind": "surprise",
+    "d_ff": 512,
+    "seed": 2
+  },
+  {
+    "name": "small-knn-s2",
+    "out_dir": "runs/sweep_small/knn_s2",
+    "steps": 10000,
+    "memory_kind": "knn",
+    "d_ff": 512,
+    "seed": 2
+  },
+  {
+    "name": "small-matched_params-s2",
+    "out_dir": "runs/sweep_small/matched_params_s2",
+    "steps": 10000,
+    "memory_kind": "none",
+    "d_ff": 673,
+    "seed": 2
+  },
+  {
+    "name": "small-matched_flops-s2",
+    "out_dir": "runs/sweep_small/matched_flops_s2",
+    "steps": 10000,
+    "memory_kind": "none",
+    "d_ff": 559,
+    "seed": 2
+  }
+]
