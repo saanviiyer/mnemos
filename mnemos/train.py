@@ -102,12 +102,26 @@ class Trainer:
         if not self.last_ckpt.exists():
             return
         try:
-            ck = torch.load(self.last_ckpt, map_location=self.device, weights_only=False)
+            # CPU, deliberately. Adam keeps its per-parameter step as a tensor, and
+            # load_state_dict then places it beside its parameter. Restoring those
+            # straight onto MPS put a run in a state where a step counter read back as
+            # zero and AdamW divided by 1 - beta1**0 == 0. Loading on CPU and letting
+            # load_state_dict do the placement keeps the step counters where the
+            # non-capturable Adam path expects them.
+            ck = torch.load(self.last_ckpt, map_location="cpu", weights_only=False)
         except Exception as exc:                       # a half-written checkpoint
             print(f"[mnemos] ignoring unreadable {self.last_ckpt}: {exc}")
             return
         self.model.load_state_dict(ck["model"])
         self.opt.load_state_dict(ck["opt"])
+        # A parameter that goes several steps without a gradient keeps a stale step
+        # count, and one that reads zero makes AdamW divide by zero on the next step.
+        # Repair rather than crash: a step of zero means "never updated", which is
+        # exactly what a fresh state says.
+        for st in self.opt.state.values():
+            step = st.get("step")
+            if step is not None and float(step) < 1.0:
+                st["step"] = torch.ones_like(step) if torch.is_tensor(step) else 1.0
         self.g_train.set_state(ck["g_train"].cpu() if torch.is_tensor(ck["g_train"]) else ck["g_train"])
         self.start_step = int(ck["step"]) + 1
         self.step = self.start_step

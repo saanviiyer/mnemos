@@ -209,3 +209,25 @@ def test_a_corrupt_last_checkpoint_is_survivable(tmp_path, capsys):
     tr = Trainer(cfg)
     assert tr.start_step == 0, "an unreadable checkpoint must restart, not crash"
     assert "ignoring unreadable" in capsys.readouterr().out
+
+
+def test_resume_repairs_a_zero_step_optimizer_state(tmp_path):
+    """AdamW divides by 1 - beta1**step, so a restored step of zero is a crash.
+
+    Parameters that go long stretches without a gradient (the kNN key and value
+    projections do) leave ragged step counters in a checkpoint, and one that reads
+    back as zero killed a sweep run mid-flight.
+    """
+    cfg = _run_cfg(tmp_path, "zerostep", steps=4)
+    tr = Trainer(cfg)
+    tr.train()
+    ck = torch.load(tmp_path / "zerostep" / "ckpt_last.pt", weights_only=False)
+    victim = next(iter(ck["opt"]["state"]))
+    step = ck["opt"]["state"][victim]["step"]
+    ck["opt"]["state"][victim]["step"] = torch.zeros_like(step) if torch.is_tensor(step) else 0.0
+    torch.save(ck, tmp_path / "zerostep" / "ckpt_last.pt")
+
+    cfg.train.steps = 6
+    resumed = Trainer(cfg)
+    assert all(float(st["step"]) >= 1.0 for st in resumed.opt.state.values())
+    resumed.train()          # must not raise ZeroDivisionError
