@@ -254,8 +254,32 @@ def main() -> None:
     if args.dry_run:
         return
 
-    records = [run_one(c) for c in runs]
-    summarise(records, out_root)
+    # One failed run must not take the sweep down with it. A 19-hour grid died at
+    # 4 of 21 on an MPS "command buffer exited with error status" -- a driver-level
+    # fault, nothing to do with the model -- and the list comprehension that used to
+    # be here meant the remaining 17 runs never started. Failures are recorded and
+    # skipped; because runs resume from their checkpoints, relaunching retries them
+    # from where they died rather than from zero.
+    records, failed = [], []
+    for c in runs:
+        try:
+            records.append(run_one(c))
+        except KeyboardInterrupt:
+            raise
+        except Exception as exc:                       # noqa: BLE001 - deliberate
+            failed.append((c.name, f"{type(exc).__name__}: {exc}"))
+            print(f"[FAIL] {c.name}: {type(exc).__name__}: {exc}", flush=True)
+            print("       continuing; relaunch to retry it from its checkpoint",
+                  flush=True)
+    if failed:
+        (out_root / "failures.json").write_text(json.dumps(dict(failed), indent=2))
+        print(f"\n{len(failed)} run(s) failed and were skipped:", flush=True)
+        for name, why in failed:
+            print(f"  {name}: {why}", flush=True)
+    if records:
+        summarise(records, out_root)
+    else:
+        print("no runs completed; nothing to summarise", flush=True)
 
 
 if __name__ == "__main__":

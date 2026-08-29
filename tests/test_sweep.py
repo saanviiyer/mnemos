@@ -108,3 +108,36 @@ def test_cluster_tier_spans_the_table_size_question():
         ratios.append(bt["params_from_memory"] / bt["params_without_memory"])
     assert ratios[0] < 0.05, "smallest table is not small enough to be a floor"
     assert ratios[1] > 1.0, "largest table never exceeds the dense parameters"
+
+
+def test_one_failing_run_does_not_abort_the_sweep(tmp_path, monkeypatch, capsys):
+    """A 19-hour grid must not be one driver hiccup away from producing nothing.
+
+    An MPS command-buffer fault killed a real sweep at 4 of 21 runs; the remaining
+    17 never started. Failures are now recorded and skipped, and because every run
+    resumes from its checkpoint, relaunching retries the failed one rather than
+    redoing the sweep.
+    """
+    import scripts.sweep as sweep
+
+    calls = []
+
+    def flaky(cfg):
+        calls.append(cfg.name)
+        if len(calls) == 2:
+            raise RuntimeError("command buffer exited with error status")
+        return {"name": cfg.name, "seed": cfg.train.seed, "val_loss": 1.0,
+                "val_acc": 0.5, "params_total": 10, "flops_per_token": 10.0}
+
+    monkeypatch.setattr(sweep, "run_one", flaky)
+    monkeypatch.setattr(sys, "argv", [
+        "sweep.py", "--scale", "small", "--seeds", "0", "--arms", "none,slot",
+        "--steps", "1", "--out", str(tmp_path / "s")])
+    sweep.main()
+
+    assert len(calls) == 2, "the sweep stopped at the failure instead of continuing"
+    out = capsys.readouterr().out
+    assert "[FAIL]" in out and "1 run(s) failed" in out
+    failures = json.loads((tmp_path / "s" / "failures.json").read_text())
+    assert "command buffer" in next(iter(failures.values()))
+    assert (tmp_path / "s" / "summary.json").exists(), "surviving runs must still summarise"
