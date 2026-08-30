@@ -38,3 +38,14 @@ def test_unknown_memory_kind_fails_at_build():
     )
     with pytest.raises(KeyError):
         MemoryLM(cfg.model)
+
+
+def test_surprise_config_rejects_too_few_chunks():
+    from mnemos.config import ExperimentConfig
+    base = tiny_cfg("surprise")
+    d = base.to_dict()
+    d["model"]["memory"]["params"]["chunk_size"] = 32     # 64 // 32 == 2 chunks
+    with pytest.raises(ValueError, match="unlearnable below 3 chunks"):
+        ExperimentConfig.from_dict(d)
+    d["model"]["memory"]["params"]["chunk_size"] = 8      # 8 chunks
+    ExperimentConfig.from_dict(d)

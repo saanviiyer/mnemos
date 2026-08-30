@@ -115,4 +115,16 @@ class ExperimentConfig:
             raise ValueError("data.seq_len exceeds model.max_seq_len")
         if self.data.kind != "text" and self.data.vocab_size > m.vocab_size:
             raise ValueError("data.vocab_size exceeds model.vocab_size")
+        if m.memory.kind == "surprise":
+            # Two chunks silently freeze the momentum and forgetting rates: the first
+            # chunk multiplies a zero state and the last chunk's write is never read,
+            # so autograd never sees either rate. The run trains and reports nothing
+            # unusual, which is why this is an error rather than a note.
+            chunk = int(m.memory.params.get("chunk_size", 32))
+            n_chunks = -(-self.data.seq_len // max(chunk, 1))
+            if n_chunks < 3:
+                raise ValueError(
+                    f"surprise memory gets {n_chunks} chunk(s) at seq_len "
+                    f"{self.data.seq_len} and chunk_size {chunk}; its momentum and "
+                    "decay rates are unlearnable below 3 chunks. Lower chunk_size.")
         return self
