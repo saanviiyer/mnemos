@@ -1,0 +1,102 @@
+{
+  "name": "tiny-pkm",
+  "budget": {
+    "params_with_memory": 804096,
+    "params_without_memory": 664704,
+    "params_from_memory": 139392,
+    "param_overhead_x": 1.2097053726169844,
+    "flops_per_token_with_memory": 1513472.0,
+    "flops_per_token_without_memory": 1363968.0,
+    "flop_overhead_x": 1.1096096096096095
+  },
+  "memory_model": {
+    "params_total": 804096,
+    "params_non_embedding": 795904,
+    "params_memory": 139392,
+    "flops_per_token": 1513472.0,
+    "device": "mps",
+    "memory_kind": "product_key",
+    "val_loss": 2.2772115767002106,
+    "val_acc": 0.171630859375,
+    "val_ppl": 9.749456859110804,
+    "scored_tokens": 8192.0,
+    "mem2/slot_entropy_bits": 8.982269525527954,
+    "mem2/slot_entropy_frac": 0.8982269525527952,
+    "mem2/slots_touched_frac": 0.96063232421875,
+    "mem2/read_norm": 0.46996230632066727,
+    "mem2/ablated": 0.0
+  },
+  "read_ablation": {
+    "memory_on": {
+      "val_loss": 2.2772115767002106,
+      "val_acc": 0.171630859375,
+      "val_ppl": 9.749456859110804,
+      "scored_tokens": 8192.0
+    },
+    "memory_off": {
+      "val_loss": 2.277400553226471,
+      "val_acc": 0.171630859375,
+      "val_ppl": 9.751299451698854,
+      "scored_tokens": 8192.0
+    },
+    "delta_loss": 0.00018897652626037598,
+    "delta_acc": 0.0,
+    "diagnostics": {
+      "mem2/slot_entropy_bits": 8.983095705509186,
+      "mem2/slot_entropy_frac": 0.8983095705509186,
+      "mem2/slots_touched_frac": 0.96063232421875,
+      "mem2/read_norm": 0.46996230632066727,
+      "mem2/ablated": 0.0
+    }
+  },
+  "baseline_params": {
+    "match_on": "params",
+    "d_ff_memory_model": 256,
+    "d_ff_baseline": 347,
+    "params_memory_model": 804096.0,
+    "params_baseline": 804480.0,
+    "flops_memory_model": 1513472.0,
+    "flops_baseline": 1643520.0,
+    "param_ratio": 1.0004775549188156,
+    "flop_ratio": 1.0859269282814614,
+    "params_total": 804480,
+    "params_non_embedding": 796288,
+    "params_memory": 0,
+    "flops_per_token": 1643520.0,
+    "device": "mps",
+    "memory_kind": "none",
+    "val_loss": 2.2804300785064697,
+    "val_acc": 0.169677734375,
+    "val_ppl": 9.780886053951477,
+    "scored_tokens": 8192.0
+  },
+  "gain_over_params_matched": {
+    "delta_val_loss": 0.0032185018062591553,
+    "delta_val_acc": 0.001953125
+  },
+  "baseline_flops": {
+    "match_on": "flops",
+    "d_ff_memory_model": 256,
+    "d_ff_baseline": 305,
+    "params_memory_model": 804096.0,
+    "params_baseline": 739968.0,
+    "flops_memory_model": 1513472.0,
+    "flops_baseline": 1514496.0,
+    "param_ratio": 0.9202483285577842,
+    "flop_ratio": 1.0006765899864682,
+    "params_total": 739968,
+    "params_non_embedding": 731776,
+    "params_memory": 0,
+    "flops_per_token": 1514496.0,
+    "device": "mps",
+    "memory_kind": "none",
+    "val_loss": 2.2835018783807755,
+    "val_acc": 0.1644287109375,
+    "val_ppl": 9.810977171787066,
+    "scored_tokens": 8192.0
+  },
+  "gain_over_flops_matched": {
+    "delta_val_loss": 0.00629030168056488,
+    "delta_val_acc": 0.0072021484375
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "memory_on": {
+    "val_loss": 2.2736268416047096,
+    "val_acc": 0.175048828125,
+    "val_ppl": 9.714570206009476,
+    "scored_tokens": 16384.0
+  },
+  "memory_off": {
+    "val_loss": 2.2754264771938324,
+    "val_acc": 0.17486572265625,
+    "val_ppl": 9.732068632958526,
+    "scored_tokens": 16384.0
+  },
+  "delta_loss": 0.0017996355891227722,
+  "delta_acc": 0.00018310546875,
+  "diagnostics": {
+    "mem2/slot_entropy_bits": 8.258191019296646,
+    "mem2/slot_entropy_frac": 0.8258191019296646,
+    "mem2/slots_touched_frac": 0.819488525390625,
+    "mem2/read_norm": 5.162299707531929,
+    "mem2/ablated": 0.0
+  }
+}

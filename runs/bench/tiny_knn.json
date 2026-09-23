@@ -1,0 +1,17 @@
+{
+  "config": "tiny-knn",
+  "params_total": 713857,
+  "params_non_embedding": 705665,
+  "params_memory": 49153,
+  "flops_per_token": 2463744.0,
+  "device": "mps",
+  "memory_kind": "knn",
+  "val_loss": 2.281594529747963,
+  "val_acc": 0.17138671875,
+  "val_ppl": 9.792282052614604,
+  "scored_tokens": 8192.0,
+  "mem2/store_size": 8192.0,
+  "mem2/retrieval_hit": 0.47400243394076824,
+  "mem2/read_norm": 0.22001291625201702,
+  "mem2/ablated": 0.0
+}

@@ -1,0 +1,17 @@
+{
+  "config": "tiny-slot",
+  "params_total": 816512,
+  "params_non_embedding": 808320,
+  "params_memory": 151808,
+  "flops_per_token": 1425408.0,
+  "device": "mps",
+  "memory_kind": "slot",
+  "val_loss": 2.2816216200590134,
+  "val_acc": 0.1673583984375,
+  "val_ppl": 9.79254733217454,
+  "scored_tokens": 8192.0,
+  "mem2/write_delta": 0.003137327708865693,
+  "mem2/n_chunks": 9.0,
+  "mem2/read_norm": 0.0741028948687017,
+  "mem2/ablated": 0.0
+}

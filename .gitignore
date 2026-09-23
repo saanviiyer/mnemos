@@ -2,7 +2,10 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 .pytest_cache/
-runs/
+runs/*
+!runs/bench/
+runs/bench/*
+!runs/bench/*.json
 data/*.txt
 .DS_Store
 *.log

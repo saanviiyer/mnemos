@@ -61,7 +61,7 @@ memoryless model. Widening `d_ff` to match each budget separately:
 - Matched on params: `d_ff` 256 -> 347, parameter ratio 1.0005, **FLOP ratio 1.086**
 - Matched on FLOPs: `d_ff` 256 -> 305, FLOP ratio 1.0007, **parameter ratio 0.920**
 
-Neither control is neutral, exactly as `ablate.py` documents. The parameter-matched
+Neither control is neutral, as `ablate.py` documents. The parameter-matched
 baseline is handed 8.6% more compute than the memory model; the FLOP-matched one is
 handed 8% fewer parameters. Product-key memory beats the parameter-matched baseline by
 0.003 nats and 0.2 points, and the FLOP-matched one by 0.006 nats and 0.7 points. Both
@@ -92,7 +92,7 @@ disagree completely and only the causal test noticed.
 The two product-key runs above share a config and a seed. Their validation losses agree
 to four decimals (2.27706 vs 2.27721). Their `read_norm` differs by 11x (5.16 vs 0.47).
 
-On MPS, no seed reproduces exactly across executions, and `read_norm` turns out to be
+On MPS, no seed reproduces bit-for-bit across executions, and `read_norm` turns out to be
 one of the quantities that does not survive that. So **`read_norm` magnitude is not a
 reportable single-run statistic** in this repo, and any claim resting on it needs several
 executions. What did survive both runs is the thing being claimed: the ablation delta was

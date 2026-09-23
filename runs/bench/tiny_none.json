@@ -1,0 +1,13 @@
+{
+  "config": "tiny-none",
+  "params_total": 664704,
+  "params_non_embedding": 656512,
+  "params_memory": 0,
+  "flops_per_token": 1363968.0,
+  "device": "mps",
+  "memory_kind": "none",
+  "val_loss": 2.283826470375061,
+  "val_acc": 0.16650390625,
+  "val_ppl": 9.814162253331167,
+  "scored_tokens": 8192.0
+}

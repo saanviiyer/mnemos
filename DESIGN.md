@@ -38,7 +38,7 @@ It is tested for, per module, in `tests/test_model.py::test_no_future_leakage` a
 ## 3. Read gates start closed
 
 Every memory module's output projection is zero-initialised, so a freshly built model
-is exactly its memoryless counterpart and the memory read has to earn its way in
+is precisely its memoryless counterpart and the memory read has to earn its way in
 through training. Two consequences worth knowing:
 
 - Early training is stable. The memory cannot inject noise into a model that has not

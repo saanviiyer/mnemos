@@ -81,7 +81,7 @@ the matched controls to price it correctly.
 ## Causality
 
 Three of the four modules hold state that is written as the sequence runs, which is
-exactly where memory implementations leak the future into the past. Every stateful
+precisely where memory implementations leak the future into the past. Every stateful
 module here is chunked so that **a token reads the memory as it stood before its own
 chunk began**, and writes land only after the read. Chunk size is a config knob;
 `chunk_size: 1` is strict per-token causality at a higher wall-clock cost.

@@ -1,0 +1,17 @@
+{
+  "config": "tiny-surprise",
+  "params_total": 697603,
+  "params_non_embedding": 689411,
+  "params_memory": 32899,
+  "flops_per_token": 1462272.0,
+  "device": "mps",
+  "memory_kind": "surprise",
+  "val_loss": 2.2827533781528473,
+  "val_acc": 0.170654296875,
+  "val_ppl": 9.803636400764901,
+  "scored_tokens": 8192.0,
+  "mem2/surprise": 2.746097319655948,
+  "mem2/mem_norm": 47.65873575210571,
+  "mem2/read_norm": 0.8854854293167591,
+  "mem2/ablated": 0.0
+}

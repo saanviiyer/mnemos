@@ -1,0 +1,18 @@
+{
+  "config": "tiny-pkm",
+  "params_total": 804096,
+  "params_non_embedding": 795904,
+  "params_memory": 139392,
+  "flops_per_token": 1513472.0,
+  "device": "mps",
+  "memory_kind": "product_key",
+  "val_loss": 2.2770641148090363,
+  "val_acc": 0.1751708984375,
+  "val_ppl": 9.748019291760244,
+  "scored_tokens": 8192.0,
+  "mem2/slot_entropy_bits": 8.251085698604584,
+  "mem2/slot_entropy_frac": 0.8251085698604581,
+  "mem2/slots_touched_frac": 0.82000732421875,
+  "mem2/read_norm": 5.161225825548172,
+  "mem2/ablated": 0.0
+}
